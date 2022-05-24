@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Planet, People
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +38,27 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+#en este archivo vamos a crear nuestras rutas
+@app.route('/people', methods=['GET'])
+def get_people():
+    allpeople = People.query.all() #retorna un arreglo de clases 
+    allpeople = list(map(lambda elemento: elemento.serialize(), allpeople)) #itero en cada una de las clases y almaceno el resultado de la funcion serialize
+    print(allpeople)
+    return jsonify({"resultado": allpeople})
+
+@app.route('/people/<int:id>', methods=['GET'])
+def get_one_people(id):
+    #bajo un parametro especifico
+    #onepeople = People.query.filter_by(id=id).first()
+    #buscar SOLO por el id
+    onepeople = People.query.get(id)
+    if onepeople:
+        onepeople = onepeople.serialize()
+        return jsonify({"resultado": onepeople})
+    else:
+        return jsonify({"resultado": "personaje no existe"})
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
