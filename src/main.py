@@ -8,8 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planet, People
-#from models import Person
+from models import db, User, People, Planet
+
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -58,6 +58,13 @@ def get_one_people(id):
         return jsonify({"resultado": onepeople})
     else:
         return jsonify({"resultado": "personaje no existe"})
+
+@app.route('/planet', methods=['GET'])
+def get_planet():
+    allplanet = Planet.query.all() #retorna un arreglo de clases 
+    allplanet = list(map(lambda elemento: elemento.serialize(), allplanet)) #itero en cada una de las clases y almaceno el resultado de la funcion serialize
+    print(allplanet)
+    return jsonify({"resultado": allplanet})
 
 
 # this only runs if `$ python src/main.py` is executed
