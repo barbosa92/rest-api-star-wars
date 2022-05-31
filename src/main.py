@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planet
+from models import db, User, People, Planet, Fav_people, Fav_planet
 
 
 app = Flask(__name__)
@@ -47,6 +47,14 @@ def get_people():
     print(allpeople)
     return jsonify({"resultado": allpeople})
 
+
+@app.route('/planet', methods=['GET'])
+def get_planet():
+    allplanet = Planet.query.all() #retorna un arreglo de clases 
+    allplanet = list(map(lambda elemento: elemento.serialize(), allplanet)) #itero en cada una de las clases y almaceno el resultado de la funcion serialize
+    print(allplanet)
+    return jsonify({"resultado": allplanet})
+
 @app.route('/people/<int:id>', methods=['GET'])
 def get_one_people(id):
     #bajo un parametro especifico
@@ -59,13 +67,62 @@ def get_one_people(id):
     else:
         return jsonify({"resultado": "personaje no existe"})
 
-@app.route('/planet', methods=['GET'])
-def get_planet():
-    allplanet = Planet.query.all() #retorna un arreglo de clases 
-    allplanet = list(map(lambda elemento: elemento.serialize(), allplanet)) #itero en cada una de las clases y almaceno el resultado de la funcion serialize
-    print(allplanet)
-    return jsonify({"resultado": allplanet})
+@app.route('/planet/<int:id>', methods=['GET'])
+def get_one_planet(id):
+    #bajo un parametro especifico
+    #oneplanet = Planet.query.filter_by(id=id).first()
+    #buscar SOLO por el id
+    oneplanet = Planet.query.get(id)
+    if oneplanet:
+        oneplanet = oneplanet.serialize()
+        return jsonify({"resultado": oneplanet})
+    else:
+        return jsonify({"resultado": "planeta no existe"})
 
+@app.route('/favourite/people/<int:people_id>', methods = ['POST'])
+def add_fav_people(people_id):
+    onepeople = People.query.get(people_id)
+    if onepeople:
+        new = Fav_people()
+        new.user_id = 1
+        new.people_id = people_id
+        db.session.add(new)#agrego el registro a la base de datos
+        db.session.commit()#guardar los cambios realizados
+        return jsonify({"resultado": "Todo salio bien"})
+    else:
+        return jsonify({"resultado": "el personaje no existe"})
+
+@app.route('/favourite/planet/<int:planet_id>', methods = ['POST'])
+def add_fav_planet(planet_id):
+    oneplanet = Planet.query.get(planet_id)
+    if oneplanet:
+        new = Fav_planet()
+        new.user_id = 1
+        new.planet_id = planet_id
+        db.session.add(new)#agrego el registro a la base de datos
+        db.session.commit()#guardar los cambios realizados
+        return jsonify({"resultado": "Todo salio bien"})
+    else:
+        return jsonify({"resultado": "el planeta no existe"})
+
+# @app.route('/favourite/planet/<int:planet_id>', methods = ['DELETE'])
+# def delete_fav_planet(planet_id):
+#     oneplanet = Planet.query.get(planet_id)
+#     print(oneplanet)
+
+#     if oneplanet:
+#         new = Fav_planet()
+#         print(new)
+#         new.user_id = 1
+#         print(new.user_id)
+#         new.planet_id = planet_id
+#         print(new.planet_id)
+
+#         # db.session.pop(planet_id)#agrego el registro a la base de datos
+#         # db.session.commit()#guardar los cambios realizados
+#         return jsonify({"resultado": "Todo salio bien"})
+#     else:
+#         return jsonify({"resultado": "el planeta no existe"})
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
