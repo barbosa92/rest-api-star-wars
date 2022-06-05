@@ -30,6 +30,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+#FALTA POR HACER
 @app.route('/user', methods=['GET'])
 def handle_hello():
 
@@ -39,7 +40,7 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-#en este archivo vamos a crear nuestras rutas
+#Lista todos los registros de People en la BBDD
 @app.route('/people', methods=['GET'])
 def get_people():
     allpeople = People.query.all() #retorna un arreglo de clases 
@@ -47,7 +48,7 @@ def get_people():
     print(allpeople)
     return jsonify({"resultado": allpeople})
 
-
+#Lista todos los registros de Planet en la BBDD
 @app.route('/planet', methods=['GET'])
 def get_planet():
     allplanet = Planet.query.all() #retorna un arreglo de clases 
@@ -55,6 +56,7 @@ def get_planet():
     print(allplanet)
     return jsonify({"resultado": allplanet})
 
+#Lista un el registro indicado de la tabla People
 @app.route('/people/<int:id>', methods=['GET'])
 def get_one_people(id):
     #bajo un parametro especifico
@@ -67,10 +69,11 @@ def get_one_people(id):
     else:
         return jsonify({"resultado": "personaje no existe"})
 
+#Lista un el registro indicado de la tabla Planet
 @app.route('/planet/<int:id>', methods=['GET'])
 def get_one_planet(id):
     #bajo un parametro especifico
-    #oneplanet = Planet.query.filter_by(id=id).first()
+    # oneplanet = Planet.query.filter_by(id=id).first()
     #buscar SOLO por el id
     oneplanet = Planet.query.get(id)
     if oneplanet:
@@ -79,6 +82,7 @@ def get_one_planet(id):
     else:
         return jsonify({"resultado": "planeta no existe"})
 
+#Añade una nueva fila (people) a la tabla Fav_people
 @app.route('/favourite/people/<int:people_id>', methods = ['POST'])
 def add_fav_people(people_id):
     onepeople = People.query.get(people_id)
@@ -92,6 +96,7 @@ def add_fav_people(people_id):
     else:
         return jsonify({"resultado": "el personaje no existe"})
 
+#Añade una nueva fila (planet) a la tabla Fav_planet
 @app.route('/favourite/planet/<int:planet_id>', methods = ['POST'])
 def add_fav_planet(planet_id):
     oneplanet = Planet.query.get(planet_id)
@@ -105,24 +110,25 @@ def add_fav_planet(planet_id):
     else:
         return jsonify({"resultado": "el planeta no existe"})
 
-# @app.route('/favourite/planet/<int:planet_id>', methods = ['DELETE'])
-# def delete_fav_planet(planet_id):
-#     oneplanet = Planet.query.get(planet_id)
-#     print(oneplanet)
-
-#     if oneplanet:
-#         new = Fav_planet()
-#         print(new)
-#         new.user_id = 1
-#         print(new.user_id)
-#         new.planet_id = planet_id
-#         print(new.planet_id)
-
-#         # db.session.pop(planet_id)#agrego el registro a la base de datos
-#         # db.session.commit()#guardar los cambios realizados
-#         return jsonify({"resultado": "Todo salio bien"})
-#     else:
-#         return jsonify({"resultado": "el planeta no existe"})
+#Elimina el personaje cuyo índice es idicado
+@app.route('/favourite/people/<int:people_id>', methods = ['DELETE'])
+def delete_fav_people(people_id):
+    onepeople = Fav_people.query.get(people_id)
+    print(onepeople)
+    db.session.delete(onepeople)
+    db.session.commit()
+    onepeople = onepeople.serialize()
+    return jsonify({"Ha sido borrado el personaje": onepeople})
+    
+#Elimina el planeta cuyo índice es idicado
+@app.route('/favourite/planet/<int:planet_id>', methods = ['DELETE'])
+def delete_fav_planet(planet_id):
+    oneplanet = Fav_planet.query.get(planet_id)
+    print(oneplanet)
+    db.session.delete(oneplanet)
+    db.session.commit()
+    oneplanet = oneplanet.serialize()
+    return jsonify({"Ha sido borrado el planeta": oneplanet})
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
