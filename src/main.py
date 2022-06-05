@@ -31,14 +31,82 @@ def sitemap():
     return generate_sitemap(app)
 
 #FALTA POR HACER
-@app.route('/user', methods=['GET'])
-def handle_hello():
+@app.route('/users', methods=['GET'])
+def get_users():
+    alluser = User.query.all()
+    alluser = list(map(lambda elemento: elemento.serialize(), alluser))
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+    return jsonify({"Usuarios" : alluser}), 200
 
-    return jsonify(response_body), 200
+@app.route('/users/favourites', methods=['GET'])
+def get_favourites():
+    allfavourites = Fav_people.query.all()
+    allfavourites = list(map(lambda elemento: elemento.serialize(), allfavourites))
+    peoples = []
+    for e in allfavourites:
+
+        contador = 0
+        contador2 = 0
+
+        for i in e:
+
+            contador += 1
+
+            if i == "people_id":
+
+                diccionary = {}
+                print (e[i])
+                contador2 += 1
+                print(f"Identifica {contador2} veces")
+                people = People.query.filter_by(id = e[i])
+                people = list(map(lambda elemento: elemento.serialize(), people))
+
+                for el in people:
+
+                    for key in el:
+
+                        print(key)
+                        print(el[key])
+                        diccionary[key] = el[key]
+                        print(diccionary)
+
+                peoples.append(diccionary)
+                print(peoples)
+
+    allfavourite = Fav_planet.query.all()
+    allfavourite = list(map(lambda elemento: elemento.serialize(), allfavourite))
+    for e in allfavourite:
+
+        contador = 0
+        contador2 = 0
+
+        for i in e:
+
+            contador += 1
+
+            if i == "planet_id":
+
+                diccionary = {}
+                print (e[i])
+                contador2 += 1
+                print(f"Identifica {contador2} veces")
+                people = Planet.query.filter_by(id = e[i])
+                people = list(map(lambda elemento: elemento.serialize(), people))
+
+                for el in people:
+
+                    for key in el:
+
+                        print(key)
+                        print(el[key])
+                        diccionary[key] = el[key]
+                        print(diccionary)
+
+                peoples.append(diccionary)
+                # print(peoples)
+                
+    return jsonify({"Personajes y planetas favoritos" : peoples}), 200         
+
 
 #Lista todos los registros de People en la BBDD
 @app.route('/people', methods=['GET'])
@@ -59,9 +127,7 @@ def get_planet():
 #Lista un el registro indicado de la tabla People
 @app.route('/people/<int:id>', methods=['GET'])
 def get_one_people(id):
-    #bajo un parametro especifico
-    #onepeople = People.query.filter_by(id=id).first()
-    #buscar SOLO por el id
+
     onepeople = People.query.get(id)
     if onepeople:
         onepeople = onepeople.serialize()
@@ -72,9 +138,7 @@ def get_one_people(id):
 #Lista un el registro indicado de la tabla Planet
 @app.route('/planet/<int:id>', methods=['GET'])
 def get_one_planet(id):
-    #bajo un parametro especifico
-    # oneplanet = Planet.query.filter_by(id=id).first()
-    #buscar SOLO por el id
+
     oneplanet = Planet.query.get(id)
     if oneplanet:
         oneplanet = oneplanet.serialize()
