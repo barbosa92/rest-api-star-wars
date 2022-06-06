@@ -50,7 +50,7 @@ class Planet (db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.diameter,
+            "name": self.name,
             "diameter": self.diameter,
             "climate": self.climate,
             "terrain": self.terrain,

@@ -40,72 +40,83 @@ def get_users():
 
 @app.route('/users/favourites', methods=['GET'])
 def get_favourites():
-    allfavourites = Fav_people.query.all()
-    allfavourites = list(map(lambda elemento: elemento.serialize(), allfavourites))
-    peoples = []
-    for e in allfavourites:
+    #Selecciona y serializa la información de la tabla Fav_people
+    favpeople = Fav_people.query.all()
+    favpeople = list(map(lambda elemento: elemento.serialize(), favpeople))
+    favs = []
 
+    #Recorre la lista (favpeople) de diccionarios 
+    for e in favpeople:
         contador = 0
         contador2 = 0
 
+        #Recorre los pares clave/valor de cada diccionario
         for i in e:
 
             contador += 1
 
+            #Selecciona solo el par cuya key es "people_id"
             if i == "people_id":
 
                 diccionary = {}
-                print (e[i])
                 contador2 += 1
-                print(f"Identifica {contador2} veces")
+
+                #Selecciona solo aquellos elementos de people cuya id sea igual a la obtenida de "people_id"
                 people = People.query.filter_by(id = e[i])
                 people = list(map(lambda elemento: elemento.serialize(), people))
 
+                #Recorre la lista de diccionarios people
                 for el in people:
-
+                    
+                    #Recorre el objeto "el" para obtener sus "key"
                     for key in el:
 
-                        print(key)
-                        print(el[key])
+                        #Añade a diccionary los pares clave/valor del diccionario "el"
                         diccionary[key] = el[key]
-                        print(diccionary)
 
-                peoples.append(diccionary)
-                print(peoples)
+                #Añade los diccionarios "people" a la lista "favs"
+                favs.append(diccionary)
 
-    allfavourite = Fav_planet.query.all()
-    allfavourite = list(map(lambda elemento: elemento.serialize(), allfavourite))
-    for e in allfavourite:
+    #Selecciona y serializa la información de la tabla Fav_planet
+    favplanet = Fav_planet.query.all()
+    favplanet = list(map(lambda elemento: elemento.serialize(), favplanet))
+
+    #Recorre la lista (favplanet) de diccionarios 
+    for e in favplanet:
 
         contador = 0
         contador2 = 0
 
+        #Recorre los pares clave/valor de cada diccionario
         for i in e:
 
             contador += 1
 
+            #Selecciona solo el par cuya key es "planet_id"
             if i == "planet_id":
 
                 diccionary = {}
-                print (e[i])
                 contador2 += 1
-                print(f"Identifica {contador2} veces")
-                people = Planet.query.filter_by(id = e[i])
-                people = list(map(lambda elemento: elemento.serialize(), people))
 
-                for el in people:
+                #Selecciona solo aquellos elementos de planet cuya id sea igual a la obtenida de "planet_id"
+                planet = Planet.query.filter_by(id = e[i])
+                planet = list(map(lambda elemento: elemento.serialize(), planet))
 
+                #Recorre la lista de diccionarios planet
+                for el in planet:
+
+                    #Recorre el objeto "el" para obtener sus "key"
                     for key in el:
 
-                        print(key)
-                        print(el[key])
-                        diccionary[key] = el[key]
-                        print(diccionary)
 
-                peoples.append(diccionary)
-                # print(peoples)
+                        #Añade a diccionary los pares clave/valor del diccionario "el"
+                        diccionary[key] = el[key]
+
+
+                #Añade los diccionarios "planet" a la lista "favs"
+                favs.append(diccionary)
                 
-    return jsonify({"Personajes y planetas favoritos" : peoples}), 200         
+    return jsonify({"Personajes y planetas favoritos" : favs}), 200         
 
 
 #Lista todos los registros de People en la BBDD
